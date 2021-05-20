@@ -28,6 +28,7 @@
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
+from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
 assert cf
@@ -39,12 +40,40 @@ los mismos.
 
 # Construccion de modelos
 
+def newAnalyzer():
+    analyzer = {'country': None,
+                'landing': None
+                }                
+    analyzer['country'] = om.newMap(omaptype='RBT',
+                                      comparefunction=compareValue)
+    analyzer['landing'] = om.newMap(omaptype='RBT',
+                                      comparefunction=compareValue)
+    return analyzer
+
 # Funciones para agregar informacion al catalogo
+
+def addCountry(datos, dic):
+    mapa = datos["country"]
+    pais = dic["CountryName"]
+    om.put(mapa, pais, dic)
+    return datos
+def addlanding(datos, dic):
+    mapa = datos['landing']
+    point_id = dic["landing_point_id"]
+    om.put(mapa, point_id, dic)
 
 # Funciones para creacion de datos
 
 # Funciones de consulta
 
 # Funciones utilizadas para comparar elementos dentro de una lista
+
+def compareValue(val1, val2):
+    if (val1 == val2):
+        return 0
+    elif (val1 > val2):
+        return 1
+    else:
+        return -1
 
 # Funciones de ordenamiento

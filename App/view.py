@@ -25,8 +25,13 @@ import sys
 import controller
 from DISClib.ADT import list as lt
 assert cf
-
-
+from DISClib.ADT import list as lt
+from DISClib.ADT import map as mp
+from DISClib.ADT.graph import gr
+from DISClib.DataStructures import mapentry as me
+countries = "countries.csv"
+landing_points_file = "landing_points.csv"
+connectionsfile = "connections.csv"
 """
 La vista se encarga de la interacción con el usuario
 Presenta el menu de opciones y por cada seleccion
@@ -35,11 +40,24 @@ operación solicitada
 """
 
 def printMenu():
+    print("\n")
+    print("------------------------------------")
+    print("------------------------------------")
     print("Bienvenido")
-    print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("1- Crear el catálogo")
+    print("2- Cargar información en el catálogo")
+    print("3- Identificar los clústeres de comunicación")
+    print("4-  Identificar los puntos de conexión críticos de la red")
+    print("5- La ruta de menor distancia ")
+    print("6- Identificar la Infraestructura Crítica de la Red ")
+    print("7- Análisis de fallas")
+    print("8- Los mejores canales para transmitir")
+    print("9-  La mejor ruta para comunicarme")
+    print("10- Graficando los Grafos")
+    print("0- Salir")
+    print("------------------------------------")
+    print("------------------------------------")
 
-catalog = None
 
 """
 Menu principal
@@ -49,9 +67,9 @@ while True:
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
-
+        datos = controller.init()
     elif int(inputs[0]) == 2:
-        pass
+        controller.loadData(datos,countries,landing_points_file,connectionsfile)
 
     else:
         sys.exit(0)
