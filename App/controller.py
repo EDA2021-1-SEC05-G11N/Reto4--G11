@@ -20,6 +20,7 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
+from sys import meta_path
 import config as cf
 import model
 import csv
@@ -30,32 +31,58 @@ El controlador se encarga de mediar entre la vista y el modelo.
 """
 
 # Inicialización del Catálogo de libros
-def init():
-    datos = model.newAnalyzer()
+def inicio():
+    datos = model.inicio()
     return datos
 
 # Funciones para la carga de datos
+def carga(datos, connections, countries, landing):
+    cargaLanding(datos, landing)
+    cargaConnections(datos, connections)
+    cargaCountries(datos, countries)
 
-def loadData(datos, countries,landing_points_file,connectionsfile):
-    loadCountrie(datos, countries)
-    loadlanding(datos,landing_points_file)
-    loadconnections(datos,connectionsfile)
-
-def loadCountrie(datos, countriesfile):
-    file = cf.data_dir + countriesfile
-    input_file = csv.DictReader(open(file, encoding="utf-8"),
+def cargaLanding(datos, landing):
+    cfile = cf.data_dir + landing
+    file = csv.DictReader(open(cfile, encoding="utf-8"),
                                 delimiter=",")
 
-    for i in input_file:
-        model.addCountry(datos, i)
-def loadlanding(datos,landing_points_file):
-    file = cf.data_dir + landing_points_file
-    input_file = csv.DictReader(open(file, encoding="utf-8"),
+    a = True
+    for i in file:
+        if a:
+            print(i)
+            a = False
+        model.agregarLanding(datos, i)
+
+def cargaConnections(datos, connections):
+    cfile = cf.data_dir + connections
+    file = csv.DictReader(open(cfile, encoding="utf-8"),
                                 delimiter=",")
-    for i in input_file:
-        model.addlanding(datos, i)
-def loadconnections(datos,connectionsfile):
-    
+
+    a = True
+    for i in file:
+        if a:
+            print(i)
+            a = False
+        model.agregarconexion(datos, i)
+
+def cargaCountries(datos, countrie):
+    cfile = cf.data_dir + countrie
+    file = csv.DictReader(open(cfile, encoding="utf-8"),
+                                delimiter=",")
+
+    for i in file:
+        model.agregarpais(datos, i)
+
+
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
+def totalpoints(datos):
+    return model.totalpoints(datos)
+
+
+def totalcables(datos):
+    return model.totalcables(datos)
+
+def totalCountries(datos):
+    return model.totalCountries(datos)

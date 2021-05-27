@@ -25,10 +25,11 @@
  """
 
 
+from sys import meta_path
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
-from DISClib.ADT import orderedmap as om
+from DISClib.ADT.graph import gr
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
 assert cf
@@ -39,41 +40,162 @@ los mismos.
 """
 
 # Construccion de modelos
+def inicio():
+    datos = {
+                'pais': None,
+                'landing': None,
+                'pais_cable': None,
+                'capacidad': None,
+                'cables': None,
+                }
+    datos['pais'] = mp.newMap(numelements=14000,
+                                     maptype='PROBING',
+                                     comparefunction=comparemap)
 
-def newAnalyzer():
-    analyzer = {'country': None,
-                'landing': None
-                }                
-    analyzer['country'] = om.newMap(omaptype='RBT',
-                                      comparefunction=compareValue)
-    analyzer['landing'] = om.newMap(omaptype='RBT',
-                                      comparefunction=compareValue)
-    return analyzer
+    datos['pais_cable'] = mp.newMap(numelements=14000,
+                                     maptype='PROBING',
+                                     comparefunction=comparemap)    
+
+    datos['capacidad'] = mp.newMap(numelements=14000,
+                                     maptype='PROBING',
+                                     comparefunction=comparemap)
+
+    datos['landing'] = mp.newMap(numelements=1400,
+                                     maptype='PROBING',
+                                     comparefunction=comparemap)
+
+    datos['cables'] = gr.newGraph(datastructure='ADJ_LIST',
+                                    directed=True,
+                                    size=14000,
+                                    comparefunction=comparegrafo)
+
+    return datos
 
 # Funciones para agregar informacion al catalogo
-
-def addCountry(datos, dic):
-    mapa = datos["country"]
-    pais = dic["CountryName"]
-    om.put(mapa, pais, dic)
+def agregarLanding(datos, dic):
+    mp.put(datos["landing"], int(dic["landing_point_id"]), dic)
     return datos
-def addlanding(datos, dic):
-    mapa = datos['landing']
-    point_id = dic["landing_point_id"]
-    om.put(mapa, point_id, dic)
+    
+def agregarconexion(datos, dic):
+    cable = dic["cable_name"]
+    origin = formatVertex(datos, dic['\ufefforigin'], cable)
+    destination = formatVertex(datos, dic["destination"], cable)
+    d = dic["cable_length"].replace(" km", "")
+    if 'n.a.' in d:
+        distance = 0
+    else:
+        distance = float(d.replace(",", ""))
+    agregarPoint(datos, origin)
+    agregarPoint(datos, destination)
+    agregarcable(datos, origin, destination, distance)
+    connection = origin + destination + cable
+    capacity = float(dic["capacityTBPS"])
+    agregarCapacity(datos, connection, capacity)
+    agregarCountrypoint(datos, dic, destination, connection, capacity)
+    return datos
+
+def agregarpais(datos, dic):
+    mp.put(datos["pais"], dic["CountryName"], dic)
+    return datos
+
+# Funciones de interacción entre estructuras
+def PointInfo(datos, lpid):
+    map = datos['landing']
+    a = mp.get(map, int(lpid))
+    info = me.getValue(a)
+    return info 
 
 # Funciones para creacion de datos
+def formatVertex(datos, landingpoint, cable):
+    lpinfo = PointInfo(datos, landingpoint)
+    name = lpinfo["id"]
+    name = name + '-' + cable
+    return name
+
+def agregarPoint(datos, landingpoint):
+    if not gr.containsVertex(datos["cables"], landingpoint):
+        gr.insertVertex(datos["cables"], landingpoint)
+    return datos
+
+def agregarcable(datos, origen, destino, distancia):
+    edge = gr.getEdge(datos['cables'], origen, destino)
+    if edge is None:
+        gr.addEdge(datos['cables'], origen, destino, distancia)
+    return datos
+
+def agregarCapacity(datos, conexion, capacidad):
+    mp.put(datos["capacidad"], conexion, capacidad)
+    return datos
+
+def agregarCountrypoint(datos, landingpoint, lpvertex, connection, capacity):
+    lpinfo = PointInfo(datos, landingpoint["destination"])
+    lpname = lpinfo["name"].split(",")
+    namesize = len(lpname)
+    
+    if namesize == 3:
+        country = lpname[2].lower().replace(" ", "")
+    elif namesize == 2:
+        country = lpname[1].lower().replace(" ", "")
+    else:
+        country = "No identified"
+    if mp.contains(datos['pais_cable'], country):
+        a = mp.get(datos['pais_cable'], country)
+        countrylist = me.getValue(a)
+    else:
+        countrylist = lt.newList(datastructure= 'ARRAY_LIST')
+    lt.addLast(countrylist, {"name": connection, "capacity": capacity, "vertex": lpvertex})
+
+    min = 1000000000000000
+    for i in lt.iterator(countrylist):
+        if i["capacity"] < min:
+            min = i["capacity"]
+
+    for i in lt.iterator(countrylist):         
+        if i["vertex"] != lpvertex:
+            agregarcable(datos, lpvertex, i["vertex"], 0.1)
+            connection = lpvertex + i["vertex"] + "IC"
+            agregarCapacity(datos, connection, min)
+
+    mp.put(datos['pais_cable'], country, countrylist)
+
+    return datos
 
 # Funciones de consulta
+def totalpoints(datos):
+    return gr.numVertices(datos['cables'])
+
+def totalcables(datos):
+    return gr.numEdges(datos['cables'])
+
+def totalCountries(datos):
+    return mp.size(datos['pais'])
 
 # Funciones utilizadas para comparar elementos dentro de una lista
-
-def compareValue(val1, val2):
-    if (val1 == val2):
+def comparegrafo(stop, keyvaluestop):
+    """
+    Compara dos estaciones
+    """
+    stopcode = keyvaluestop['key']
+    if (stop == stopcode):
         return 0
-    elif (val1 > val2):
+    elif (stop > stopcode):
         return 1
     else:
         return -1
 
+def comparemap(val1, val2):
+    if (val1 == val2):
+        return 1
+    else:
+        return 0
+
+def compareCapacity(lp1, lp2):
+    if lp1["capacity"] > lp2["capacity"]:
+        return True
+    else:
+        return False
+
 # Funciones de ordenamiento
+def sort(lst, comparefunction):
+    sorted_list = sa.sort(lst, comparefunction)
+    return sorted_list

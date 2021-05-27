@@ -29,9 +29,10 @@ from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.ADT.graph import gr
 from DISClib.DataStructures import mapentry as me
+connections = "connections.csv"
 countries = "countries.csv"
-landing_points_file = "landing_points.csv"
-connectionsfile = "connections.csv"
+landing = "landing_points.csv"
+datos = None
 """
 La vista se encarga de la interacción con el usuario
 Presenta el menu de opciones y por cada seleccion
@@ -62,15 +63,43 @@ def printMenu():
 """
 Menu principal
 """
+
+    
+
 while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
-        print("Cargando información de los archivos ....")
-        datos = controller.init()
-    elif int(inputs[0]) == 2:
-        controller.loadData(datos,countries,landing_points_file,connectionsfile)
+        print("\nCreando el catálogo de datos ....")
+        datos = controller.inicio()
 
+    elif int(inputs[0]) == 2:
+        print("\nCargando información de los archivos ....")
+        controller.carga(datos, connections, countries, landing)
+        nc = controller.totalcables(datos)
+        nlp = controller.totalpoints(datos)
+        np = controller.totalCountries(datos)
+        print('Numero de landing points: ' + str(nlp))
+        print('Numero de cables: ' + str(nc))
+        print('Numero de paises: ' + str(np))
+
+    elif int(inputs[0]) == 3:
+        pass
+
+    elif int(inputs[0]) == 4:
+        pass
+    
+    elif int(inputs[0]) == 5:
+        pass
+
+    elif int(inputs[0]) == 6:
+        pass
+
+    elif int(inputs[0]) == 7:
+        pass
+    
+    elif int(inputs[0]) == 8:
+        pass
     else:
         sys.exit(0)
 sys.exit(0)
