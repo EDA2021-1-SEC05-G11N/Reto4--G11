@@ -99,9 +99,11 @@ while True:
         pass
 
     elif int(inputs[0]) == 7:
-        landingpoint=input('ingresa el landing point que deseas consultar: ')
-        controller.req5(datos,landingpoint)
-    
+        landingpoint='fortaleza'
+        #landingpoint=input('ingresa el landing point que deseas consultar: ')
+        x=controller.req5(datos,landingpoint)
+        print('la cantidad de paises afectados es:{0} '.format(len(x)))
+        print('la lista de paises afectados es : {0}'.format(x))
     elif int(inputs[0]) == 8:
         pass
     else:

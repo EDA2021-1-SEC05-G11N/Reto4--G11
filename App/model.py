@@ -73,6 +73,10 @@ def inicio():
 
 # Funciones para agregar informacion al catalogo
 def agregarLanding(datos, dic):
+    remplazar = dic["id"]
+    nombre = dic["name"]
+    dic["name"]= nombre.replace(' ','')
+    dic["id"]= remplazar.replace('-','')
     mp.put(datos["landing"], int(dic["landing_point_id"]), dic)
     return datos
     
@@ -171,6 +175,15 @@ def totalCountries(datos):
     return mp.size(datos['pais'])
 
 # Funciones utilizadas para comparar elementos dentro de una lista
+def esta(pais,lista,final):
+    for i in lista:
+        if (pais in i):
+            if pais not in final:
+                final.append(pais)
+            break
+    
+
+
 def comparegrafo(stop, keyvaluestop):
     """
     Compara dos estaciones
@@ -229,7 +242,10 @@ def req5(datos,landingpoint):
     vertices = gr.vertices(datos['cables'])
     tamano = lt.size(vertices)
     p=0 
+    e = 0
+    final= []
     paises =  mp.keySet(datos['pais'])
+    pais= []
     numero = 0
     while p < int(tamano):
         b=lt.getElement(vertices,p)
@@ -239,6 +255,14 @@ def req5(datos,landingpoint):
             while l < lt.size(j):
                 l+=1
                 y=lt.getElement(j,l)
-                input(y)
+                x = y.split('-')
+                if x[0] not in pais:
+                    pais.append(x[0])
             numero +=1
         p+=1
+    while e < lt.size(paises):
+        w=(lt.getElement(paises,e).lower()).replace(' ','')
+        esta(w,pais,final)
+        e+=1
+    return final
+        
