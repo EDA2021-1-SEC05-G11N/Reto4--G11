@@ -199,3 +199,46 @@ def compareCapacity(lp1, lp2):
 def sort(lst, comparefunction):
     sorted_list = sa.sort(lst, comparefunction)
     return sorted_list
+
+# requerimientoss
+def req1(datos,a,b):
+    clusteres = gr.numEdges(datos['cables'])
+    try:
+        p = gr.getEdge(datos['cables'],a,b)
+    except:
+        p = "los  landing point no se encuentran en el mismo clúster"
+
+    return (clusteres,p)
+
+def req2(datos):
+    vertices = gr.vertices(datos['cables'])
+    tamano = lt.size(vertices)
+    p=0 
+    respuesta = {}
+    while p < int(tamano):
+        b=lt.getElement(vertices,p)
+        numero = gr.degree(datos['cables'],b)
+        respuesta[b]= numero
+        p+=1
+    return respuesta
+
+def req3(datos):
+    print('entro')
+
+def req5(datos,landingpoint):
+    vertices = gr.vertices(datos['cables'])
+    tamano = lt.size(vertices)
+    p=0 
+    paises =  mp.keySet(datos['pais'])
+    numero = 0
+    while p < int(tamano):
+        b=lt.getElement(vertices,p)
+        if landingpoint in b:
+            j = gr.adjacents(datos['cables'],b)
+            l=0
+            while l < lt.size(j):
+                l+=1
+                y=lt.getElement(j,l)
+                input(y)
+            numero +=1
+        p+=1

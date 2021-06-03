@@ -86,3 +86,15 @@ def totalcables(datos):
 
 def totalCountries(datos):
     return model.totalCountries(datos)
+
+def req1(datos,landinga,landingb):
+    return model.req1(datos,landinga,landingb)
+
+def req2(datos):
+    return model.req2(datos)
+
+def req3(datos):
+    return model.req3(datos)
+
+def req5(datos,landingpoint):
+    return model.req5(datos,landingpoint)

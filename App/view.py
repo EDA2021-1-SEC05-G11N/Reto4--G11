@@ -84,19 +84,23 @@ while True:
         print('Numero de paises: ' + str(np))
 
     elif int(inputs[0]) == 3:
-        pass
+        landinga = input("ingrese un landing point: ")
+        landingb = input("ingrese un landing point: ")
+        controller.req1(datos,landinga,landingb)
 
     elif int(inputs[0]) == 4:
-        pass
-    
+        d=controller.req2(datos)
+        for i in d:
+            print('el vertice {0} tiene {1} cables coonectados'.format(i,d[i]))
     elif int(inputs[0]) == 5:
-        pass
+        controller.req3(datos)
 
     elif int(inputs[0]) == 6:
         pass
 
     elif int(inputs[0]) == 7:
-        pass
+        landingpoint=input('ingresa el landing point que deseas consultar: ')
+        controller.req5(datos,landingpoint)
     
     elif int(inputs[0]) == 8:
         pass
