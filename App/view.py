@@ -93,7 +93,9 @@ while True:
         for i in d:
             print('el vertice {0} tiene {1} cables coonectados'.format(i,d[i]))
     elif int(inputs[0]) == 5:
-        controller.req3(datos)
+        pais_a = "Colombia"
+        pais_b = 'Indonesia'
+        controller.req3(datos,pais_a,pais_b)
 
     elif int(inputs[0]) == 6:
         pass

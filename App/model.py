@@ -25,6 +25,7 @@
  """
 
 
+from DISClib.DataStructures.chaininghashtable import get
 from sys import meta_path
 import config as cf
 from DISClib.ADT import list as lt
@@ -32,6 +33,8 @@ from DISClib.ADT import map as mp
 from DISClib.ADT.graph import gr
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
+from DISClib.Algorithms.Graphs import dijsktra as di
+from DISClib.ADT import stack as st
 assert cf
 
 """
@@ -235,9 +238,49 @@ def req2(datos):
         p+=1
     return respuesta
 
-def req3(datos):
-    print('entro')
-
+def req3(datos,pais_a,pais_b):
+    
+    a= mp.get(datos['pais'],pais_a)
+    b = mp.get(datos['pais'],pais_b)
+    #capitala = (a['value']['CapitalName']).lower() es bogota pero no esta en el archivo
+    capitalb = (b['value']['CapitalName']).lower()
+    vertices = gr.vertices(datos['cables'])
+    tamano = lt.size(vertices)
+    p=0 
+    mirar = {}
+    pasar_funcion = []
+    while p < int(tamano):
+        x=lt.getElement(vertices,p)
+        ciudad= x.split('-')
+        ciudad_comparar = ciudad[0]
+        if capitalb in ciudad_comparar.lower():
+            mirar[ciudad_comparar]=x
+        if ('tolu' in ciudad_comparar.lower()):
+            mirar[ciudad_comparar]=x
+        p+=1
+    for i in mirar:
+        pasar_funcion.append(mirar[i])
+    
+    vertice1 = 'jakartaindonesia-Matrix Cable System'
+    vertice2 = 'tolucolombia-Colombian Festoon'
+    #vertice1 = pasar_funcion[0]
+    #vertice2 = pasar_funcion[1]
+    distancia_vertices = {}
+    t=di.Dijkstra(datos['cables'],vertice1)
+    distancia_total= di.distTo(t,vertice2)
+    pila_camino= di.pathTo(t,vertice2)
+    h = 0
+    while h< st.size(pila_camino):
+        D=st.pop(pila_camino)
+        verta = D['vertexA']
+        vertb =  D['vertexB']
+        U = di.Dijkstra(datos['cables'],verta)
+        distancia = di.distTo(U,vertb)
+        distancia_vertices[h]=(verta,vertb,distancia)
+        h+=1
+    
+    return (distancia_vertices,distancia_total)
+    
 def req5(datos,landingpoint):
     vertices = gr.vertices(datos['cables'])
     tamano = lt.size(vertices)
