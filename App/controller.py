@@ -96,5 +96,11 @@ def req2(datos):
 def req3(datos,pais_a,pais_b):
     return model.req3(datos,pais_a,pais_b)
 
+def req4(datos):
+    return model.req4(datos)
+
 def req5(datos,landingpoint):
     return model.req5(datos,landingpoint)
+
+def req7(datos,ip1,ip2):
+    return model.req7(datos,ip1,ip2)

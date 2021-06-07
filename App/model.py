@@ -25,15 +25,20 @@
  """
 
 
+
+from math import acos , cos ,sin ,radians
+from requests.models import parse_header_links
 from DISClib.DataStructures.chaininghashtable import get
 from sys import meta_path
 import config as cf
+import requests as re  
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.ADT.graph import gr
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
 from DISClib.Algorithms.Graphs import dijsktra as di
+from DISClib.Algorithms.Graphs import bellmanford as be
 from DISClib.ADT import stack as st
 assert cf
 
@@ -168,6 +173,14 @@ def agregarCountrypoint(datos, landingpoint, lpvertex, connection, capacity):
     return datos
 
 # Funciones de consulta
+
+def distancia_puntos(punto1,punto2):
+    punto1 = (radians(float(punto1[0])),radians(float(punto1[1])))
+    punto2 = (radians(float(punto2[0])),radians(float(punto2[1])))
+    distancia = acos(sin(punto1[0])*sin(punto2[0])+cos(punto1[0])*cos(punto2[0])*cos(punto1[1]-punto2[1]))
+    respuesta = distancia * 6371.01
+    return respuesta
+
 def totalpoints(datos):
     return gr.numVertices(datos['cables'])
 
@@ -280,6 +293,9 @@ def req3(datos,pais_a,pais_b):
         h+=1
     
     return (distancia_vertices,distancia_total)
+
+def req4(datos):
+    print('entro')
     
 def req5(datos,landingpoint):
     vertices = gr.vertices(datos['cables'])
@@ -308,4 +324,73 @@ def req5(datos,landingpoint):
         esta(w,pais,final)
         e+=1
     return final
+
+
+def req7(datos,ip1,ip2):
+    vertices = gr.vertices(datos['cables'])
+    ayuda = 0 
+    base = 'http://ip-api.com/json/'
+    ip_1 = base+ip1
+    ip_2 = base+ip2
+    mayor_ip1 = 1000000000000000000000000000000000000000000000000000000000
+    mayor_ip2 = 1000000000000000000000000000000000000000000000000000000000
+    vertice1 = ''
+    vertice2 = ''
+    posiblesip1 = []
+    posiblesip2 = []
+    distancia_ip1 = {}
+    distancia_ip2 = {}
+    info_ip1 = re.get(ip_1).json()
+    info_ip2 = re.get(ip_2).json()
+    ubicacion_ip1 = (info_ip1['lat'],info_ip1['lon'])
+    ubicacion_ip2 = (info_ip2['lat'],info_ip2['lon'])
+    l = mp.keySet(datos['landing'])
+    o = 0
+    while o < lt.size(l):
+        identificador = lt.getElement(l,o)
+        x = mp.get(datos['landing'],identificador)
+        comparar = x['value']['id']
+        if ((info_ip1['country']).replace(' ','')).lower() in comparar:
+            posiblesip1.append(x['value'])
+        elif ((info_ip2['country']).replace(' ','')).lower() in comparar:
+            posiblesip2.append(x['value'])
+        o+=1
+    for i in posiblesip1:
+        ubicion = (i['latitude'],i['longitude'])
+        respuesta = distancia_puntos(ubicion,ubicacion_ip1)
+        distancia_ip1[i['id']] = (i,respuesta)
+    for jk in posiblesip2:
+        ubicion1 = (jk['latitude'],jk['longitude'])
+        respuesta1 = distancia_puntos(ubicion1,ubicacion_ip2)
+        distancia_ip2[jk['id']] = (jk,respuesta1)
+
+    for gh in distancia_ip1:
+        if mayor_ip1 >  distancia_ip1[gh][1]:
+            mayor_ip1 = distancia_ip1[gh][1]
+            vertice1 = distancia_ip1[gh][0]
+    for lk in distancia_ip2:
+        if mayor_ip2 >  distancia_ip2[lk][1]:
+            mayor_ip2 = distancia_ip2[lk][1]
+            vertice2 = distancia_ip2[lk][0]
+    vertice1= vertice1['id']
+    vertice2= vertice2['id']
+    while ayuda < lt.size(vertices):
+        ojala = lt.getElement(vertices,ayuda)
+        kfj = ((lt.getElement(vertices,ayuda).replace('-','')).replace(' ','')).lower()
+        if vertice1 in kfj:
+            vertice1 = ojala
+        if vertice2 in kfj:
+            vertice2 = ojala
+        ayuda+=1
+    
+    grafo = datos['cables']
+    khi = di.Dijkstra(grafo,vertice1)
+    pila = di.pathTo(khi,vertice2)
+    try:
+        tamano = st.size(pila)
+        respuesta = pila
         
+    except:
+        tamano = 0
+        respuesta = 'no hay un camino entre las direcciones ip'
+    return tamano,respuesta

@@ -153,6 +153,7 @@ def pathTo(search, vertex):
     """
     try:
         if hasPathTo(search, vertex) is False:
+            
             return None
         path = stack.newStack()
         while vertex != search['source']:

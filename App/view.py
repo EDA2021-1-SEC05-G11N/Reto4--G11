@@ -86,7 +86,8 @@ while True:
     elif int(inputs[0]) == 3:
         landinga = input("ingrese un landing point: ")
         landingb = input("ingrese un landing point: ")
-        controller.req1(datos,landinga,landingb)
+        x=controller.req1(datos,landinga,landingb)
+        print(x)
 
     elif int(inputs[0]) == 4:
         d=controller.req2(datos)
@@ -98,7 +99,7 @@ while True:
         controller.req3(datos,pais_a,pais_b)
 
     elif int(inputs[0]) == 6:
-        pass
+        controller.req4(datos)
 
     elif int(inputs[0]) == 7:
         landingpoint='fortaleza'
@@ -108,6 +109,13 @@ while True:
         print('la lista de paises afectados es : {0}'.format(x))
     elif int(inputs[0]) == 8:
         pass
+    elif int(inputs[0]) == 9:
+        #primero latitud y despues longitud
+        
+        ip1='165.132.67.89'
+        ip2='8.8.8.8'
+        x=controller.req7(datos,ip1,ip2)
+        print('la ruta es {0} y tiene {1} saltos'.format(x[1],x[0])) 
     else:
         sys.exit(0)
 sys.exit(0)
